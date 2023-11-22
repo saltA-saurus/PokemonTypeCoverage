@@ -1,13 +1,14 @@
 # PokemonTypeCoverage
-By Jung Woo Lee, November 2023
+#### By Jung Woo Lee, November 2023
 
 What: Python program originally made to make Venn diagrams for Pokemon attack type coverage. Now has some additional functions.
-Why: Playing PokeMMO and Gliscor had too many moves to choose from, all of different types. There was no tool that showed type coverage quite like I wished, thus I made this tool.
+
+Why: Playing PokeMMO and Gliscor had too many moves to choose from, all of the different types. There was no tool that showed type coverage quite like I wished, thus I made this tool.
 This is for Generation V, I may add functionality for only Generation IV later.
 
-Run PokemonTypeCoverage.py
+How: Run PokemonTypeCoverage.py
 
-**Features:**
+## Features:
 
 Change Attack Types:
   Change the attack types you are dealing with
