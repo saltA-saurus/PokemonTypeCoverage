@@ -24,7 +24,10 @@ def inputUserTypes():
         type = input().replace(" ", "")
 
         if type.lower() == "stop":
-            break
+            if i == 0:
+                print("You need at least one type!")
+            else:
+                break
         elif type.upper() not in ALL_TYPES:
             print("Invalid type, please try again.")
         else:
