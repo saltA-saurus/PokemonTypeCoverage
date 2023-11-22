@@ -64,6 +64,7 @@ def inputMenu(userTypes):
         print("Defender Type Weakness Counts")
         print("Type Coverage Venn")
         print("Pokemon Coverage Venn")
+        print("Pokemon Coverage List")
         print()
     elif selection == "change attack types":
         return {"flag": "CHANGE_USER_TYPES", "data": setUserTypes()}
@@ -75,6 +76,8 @@ def inputMenu(userTypes):
         createTypeCoverageVennDiagram(userTypes)
     elif selection == "pokemon coverage venn":
         createPokemonCoverageVennDiagram(userTypes)
+    # elif selection == "pokemon coverage list":
+    #     getWeakPokemonFromTypes(userTypes)
     else:
         print("Unknown prompt, please try again.")
 
@@ -138,37 +141,74 @@ def getWeakPokemon(userTypes):
         typeIndex += 1
     return userTypeWeakPokemonList
 
+def isResistantToAttack(attackType, pokemon):
+    if (isResistantToAttackNotImmune(attackType, pokemon) or
+        isImmuneToAttack(attackType, pokemon)):
+        return True
+    return False
+
+def isResistantToAttackNotImmune(attackType, pokemon):
+    if (isStrictlySuperResistantToAttack(attackType, pokemon) or 
+        isStrictlyUltraResistantToAttack(attackType, pokemon)):
+        return True
+    return False
+
+def isImmuneToAttack(attackType, pokemon):                                                                              # i.e. x0 damage
+    pokemonTypes = allPokemonList.get(pokemon)
+    if len(pokemonTypes) == 1:
+        if pokemonTypes[0] in NO_EFFECT.get(attackType):                                                                # if one type, type must be immune
+            return True
+    elif len(pokemonTypes) == 2:
+        if pokemonTypes[0] in NO_EFFECT.get(attackType) or pokemonTypes[1] in NO_EFFECT.get(attackType):                # if 2 types, either must be immune
+            return True
+    return False
+
+def isStrictlySuperResistantToAttack(attackType, pokemon):                                                              # i.e. x2 resistance / 0.5 damage
+    pokemonTypes = allPokemonList.get(pokemon)
+    if isStrictlyUltraResistantToAttack(attackType, pokemon) is False:
+        if len(pokemonTypes) == 1:
+            if pokemonTypes[0] in INEFFECTIVE.get(attackType):                                                          # if one type, type must have resistance
+                return True
+        elif len(pokemonTypes) == 2:
+            if (pokemonTypes[0] in INEFFECTIVE.get(attackType) and pokemonTypes[1] in EFFECTIVE.get(attackType) or      # one type must have resistance while
+                pokemonTypes[1] in INEFFECTIVE.get(attackType) and pokemonTypes[0] in EFFECTIVE.get(attackType)):       # the other takes neutral damage
+                return True
+    return False
+
+def isStrictlyUltraResistantToAttack(attackType, pokemon):                                                              # i.e. x4 resistance / 0.25 damage
+    pokemonTypes = allPokemonList.get(pokemon)
+    if len(pokemonTypes) == 2:                                                                                          # can only be x4 resistant if has 2 types
+        if pokemonTypes[0] in INEFFECTIVE.get(attackType) and pokemonTypes[1] in INEFFECTIVE.get(attackType):           # both types must be resistant to attack
+            return True                                                                                                 # for x4 resistance
+    return False
+
 def isWeakToAttack(attackType, pokemon):
-    pokemonTypes = allPokemonList.get(pokemon)
-    if len(pokemonTypes) == 1:
-        if pokemonTypes[0] in SUPER_EFFECTIVE.get(attackType):
-            return True
-    elif len(pokemonTypes) == 2:
-        if (pokemonTypes[0] not in INEFFECTIVE.get(attackType) and pokemonTypes[0] not in NO_EFFECT.get(attackType) and 
-            pokemonTypes[1] not in INEFFECTIVE.get(attackType) and pokemonTypes[1] not in NO_EFFECT.get(attackType)):
-            return True
+    if isStrictlySuperWeakToAttack(attackType, pokemon) or isStrictlySuperWeakToAttack(attackType, pokemon):            # any weakness 
+        return True
     return False
 
-def isImmuneToAttack(attackType, pokemon):
+def isStrictlyUltraWeakToAttack(attackType, pokemon):                                                                   # i.e. x4 damage
     pokemonTypes = allPokemonList.get(pokemon)
-    if len(pokemonTypes) == 1:
-        if pokemonTypes[0] in NO_EFFECT.get(attackType):
-            return True
-    elif len(pokemonTypes) == 2:
-        if pokemonTypes[0] in NO_EFFECT.get(attackType) or pokemonTypes[1] in NO_EFFECT.get(attackType):
-            return True
+    if len(pokemonTypes) == 2:                                                                                          # can only be x4 weak if has 2 types
+        if pokemonTypes[0] in SUPER_EFFECTIVE.get(attackType) and pokemonTypes[1] in SUPER_EFFECTIVE.get(attackType):   # both types must take super effective damage
+            return True                                                                                                 # for x4 damage
     return False
 
-# def isResistantToAttack(attackType, pokemon):
-#     pokemonTypes = allPokemonList.get(pokemon)
-#     if len(pokemonTypes) == 1:
-#         if pokemonTypes[0] in INEFFECTIVE.get(attackType):
-#             return True
-#     elif len(pokemonTypes) == 2:
-#         if (pokemonTypes[0] not in SUPER_EFFECTIVE.get(attackType) and pokemonTypes[0] not in EFFECTIVE.get(attackType) and 
-#             pokemonTypes[1] not in INEFFECTIVE.get(attackType) and pokemonTypes[1] not in NO_EFFECT.get(attackType)):
-#             return True
-#     return False
+def isStrictlySuperWeakToAttack(attackType, pokemon):                                                                   # i.e. x2 damage
+    pokemonTypes = allPokemonList.get(pokemon)
+    if isStrictlyUltraWeakToAttack(attackType, pokemon) is False:                                                       # can't be ultra (x4) weak to be strictly weak (x2)
+        if len(pokemonTypes) == 1:
+            if pokemonTypes[0] in SUPER_EFFECTIVE.get(attackType):                                                      # if one type, must take super effective damage
+                return True
+        elif len(pokemonTypes) == 2:
+            if (pokemonTypes[0] in SUPER_EFFECTIVE.get(attackType) and pokemonTypes[1] in EFFECTIVE.get(attackType) or  # one type must take super effective damage while the
+                pokemonTypes[1] in SUPER_EFFECTIVE.get(attackType) and pokemonTypes[0] in EFFECTIVE.get(attackType)):   # other takes neutral damage for super effective damage
+                return True
+    return False
+
+# def getWeakPokemonFromTypes(*types):
+#     for type in types:
+#         return
 
 def main():
     print("Welcome!")
